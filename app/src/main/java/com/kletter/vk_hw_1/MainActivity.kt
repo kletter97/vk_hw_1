@@ -79,7 +79,7 @@ fun MainScreen()
                 Dimens.ItemSpacing
             )
         ) {
-            items(items = List(i) { it }) { index ->
+            items(count = i) { index ->
                 NumberCard(index = index+1)
             }
         }
@@ -102,6 +102,7 @@ object Dimens
     val ItemSpacing = 8.dp
     val ListBottomPadding = 8.dp
     val ButtonTopPadding = 8.dp
+    val CardTextFontSize = 24.sp
 }
 
 @Composable
@@ -124,7 +125,7 @@ fun NumberCard(index: Int) {
             Text(
                 text = index.toString(),
                 color = colorResource(R.color.card_text),
-                fontSize = 24.sp,
+                fontSize = Dimens.CardTextFontSize,
             )
         }
     }
