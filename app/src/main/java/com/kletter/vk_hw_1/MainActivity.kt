@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -15,12 +16,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.Button
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -29,6 +31,8 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.integerResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
@@ -43,10 +47,10 @@ class MainActivity : ComponentActivity() {
 
 
 
+@Preview(showSystemUi = true)
 @Composable
-fun MainScreen()
-{
-    var i: Int by rememberSaveable { mutableIntStateOf(0) }
+fun MainScreen() {
+    var cards: List<Int> by rememberSaveable { mutableStateOf(emptyList()) }
 
     val configuration = LocalConfiguration.current
 
@@ -80,25 +84,42 @@ fun MainScreen()
                 Dimens.ItemSpacing
             )
         ) {
-            items(count = i) { index ->
-                NumberCard(index = index+1)
+            items(items = cards, key = { it }) { number ->
+                NumberCard(index = number)
             }
         }
 
-        Button(
-            onClick = { i += 1 },
+        Row (
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = Dimens.ButtonTopPadding)
-        ) {
-            Text(text = stringResource(R.string.add_button))
+        )
+        {
+            Button(
+                onClick = {
+                    val next = generateSequence(1) { it + 1 }.first { it !in cards }
+                    cards = (cards + next).sorted()
+                },
+                modifier = Modifier
+                    .padding(Dimens.ButtonTopPadding)
+                    .weight(1f),
+            ) {
+                Text(text = stringResource(R.string.add_button), textAlign = TextAlign.Center)
+            }
+            Button(
+                onClick = { cards = cards.drop(1) },
+                modifier = Modifier
+                    .padding(Dimens.ButtonTopPadding)
+                    .weight(1f),
+                enabled = cards.isNotEmpty()
+            ) {
+                Text(text = stringResource(R.string.delete_button), textAlign = TextAlign.Center)
+            }
         }
     }
 
 }
 
-object Dimens
-{
+object Dimens {
     val ScreenPadding = 12.dp
     val ItemSpacing = 8.dp
     val ListBottomPadding = 8.dp
